@@ -1,0 +1,9 @@
+megs: 32
+romimage: file=$BXSHARE/BIOS-bochs-latest
+vgaromimage: file=$BXSHARE/vgabios-lgpl-latest
+keyboard: keymap=$BXSHARE/keymaps/x11-pc-fr.map
+floppya: 1_44=floppyA, status=inserted
+log: bochsout.txt
+mouse: enabled=0
+clock: sync=realtime
+#display_library: win32, options="gui_debug"
