@@ -24,7 +24,7 @@ void InterruptDescriptorTable::init() {
 
     g_idtr.size = (IDT_SIZE * sizeof(struct idt_descriptor))-1;
     g_idtr.offset = IDT_BASE;
-    Memory::copy((char*) g_idtr.offset, (char*) g_idt_descriptors, g_idtr.size+1);
+    Memory::copy(reinterpret_cast<char*>(g_idtr.offset), reinterpret_cast<char*>(g_idt_descriptors), g_idtr.size+1);
 
     asm("lidtl (g_idtr)");
 }

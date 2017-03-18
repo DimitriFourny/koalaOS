@@ -23,19 +23,19 @@ void GlobalDescriptorTable::init() {
     g_tss_default.ss0        = GDT_SEGMENT_STACK * sizeof(gdt_descriptor);
 
     // GDT Descriptors
-    Memory::fill((char*) g_gdt_descriptors, 0, sizeof(g_gdt_descriptors));
+    Memory::fill(reinterpret_cast<char*>(g_gdt_descriptors), 0, sizeof(g_gdt_descriptors));
     initDescriptor(0x0,                  0x0,                   0x0,  0x0,  &g_gdt_descriptors[GDT_SEGMENT_NULL]);
     initDescriptor(0x0,                  0xFFFFF,               0x9B, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_CODE]);       // code
     initDescriptor(0x0,                  0xFFFFF,               0x93, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_DATA]);       // data
     initDescriptor(0x0,                  0x0,                   0x97, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_STACK]);      // stack
-    initDescriptor(GDT_USERSPACE_BASE,   0x0,                   0xFB, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_USER_CODE]);  // user code
-    initDescriptor(GDT_USERSPACE_BASE,   0x0,                   0xF3, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_USER_DATA]);  // user data
-    initDescriptor(GDT_USERSPACE_BASE,   0x0,                   0xF7, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_USER_STACK]); // user stack
+    initDescriptor(0x0,                  0xFFFFF,               0xFB, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_USER_CODE]);  // user code
+    initDescriptor(0x0,                  0xFFFFF,               0xF3, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_USER_DATA]);  // user data
+    initDescriptor(0x0,                  0x0,                   0xF7, 0x0D, &g_gdt_descriptors[GDT_SEGMENT_USER_STACK]); // user stack
     initDescriptor((u32) &g_tss_default, sizeof(g_tss_default), 0x89, 0x04, &g_gdt_descriptors[GDT_SEGMENT_TSS]);        // Task State Segment
 
     g_gdtr.size   = (GDT_SIZE * sizeof(gdt_descriptor))-1;
     g_gdtr.offset = GDT_BASE;
-    Memory::copy((char*) g_gdtr.offset, (char*) g_gdt_descriptors, g_gdtr.size+1);
+    Memory::copy(reinterpret_cast<char*>(g_gdtr.offset), reinterpret_cast<char*>(g_gdt_descriptors), g_gdtr.size+1);
 
     // Load GDT
     asm("lgdtl (g_gdtr)");

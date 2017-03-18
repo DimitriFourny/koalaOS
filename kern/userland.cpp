@@ -1,7 +1,7 @@
 #include "userland.h"
 
 void userTask() {
-    char* msg = (char*) 0x100;
+    char* msg = (char*) 0x1000000 + 0x100;
     msg[0] = 'H';
     msg[1] = 'e';
     msg[2] = 'l';
@@ -17,6 +17,6 @@ void userTask() {
 
     asm("mov $0x02, %eax \n\
          int $0x30");
-
+    
     while (1);
 }

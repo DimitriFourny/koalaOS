@@ -24,10 +24,7 @@ void isr_keyboard() {
 
 void do_syscall(int sys_num, struct Context* context) {
     if (sys_num == 1) {
-        struct gdt_descriptor* ds = (struct gdt_descriptor*) (GDT_BASE + (context->ds & 0xF8));
-        u32 ds_base = ds->base0_15 + (ds->base16_23 << 16) + (ds->base24_31 << 24);
-
-        char* msg = (char*) ((int)ds_base + (int)context->ebx);
+        char* msg = reinterpret_cast<char*>(context->ebx);
         Screen::print("[userland] ");
         Screen::print(msg, SCREEN_YELLOW);
     } else {

@@ -11,7 +11,7 @@ void Screen::init(char x, char y, char attr) {
 }
 
 void Screen::clear() {
-    unsigned char* video = (unsigned char*) SCREEN_RAM_ADDR;
+    unsigned char* video = reinterpret_cast<unsigned char*>(SCREEN_RAM_ADDR);
 
     for (unsigned int i = 0; i < SCREEN_SIZE; i++) {
         video[i] = 0;
@@ -50,7 +50,7 @@ void Screen::printCharacter(unsigned char c, unsigned char attributes) {
     } else if (c == '\r') { 
         m_x = 0;
     } else {  
-        unsigned char* video = (unsigned char*)(SCREEN_RAM_ADDR + 2 * m_x + 2*SCREEN_WIDTH*m_y);
+        unsigned char* video = reinterpret_cast<unsigned char*>(SCREEN_RAM_ADDR + 2 * m_x + 2*SCREEN_WIDTH*m_y);
         video[0] = c;
         video[1] = attributes;
 
