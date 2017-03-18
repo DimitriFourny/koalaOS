@@ -19,7 +19,7 @@ void GlobalDescriptorTable::init() {
     // TSS values
     g_tss_default.debug_flag = 0x00;
     g_tss_default.io_map     = 0x00;
-    g_tss_default.esp0       = GDT_USERLAND_STACK;
+    g_tss_default.esp0       = GDT_USERLAND_LINEAR_STACK;
     g_tss_default.ss0        = GDT_SEGMENT_STACK * sizeof(gdt_descriptor);
 
     // GDT Descriptors
