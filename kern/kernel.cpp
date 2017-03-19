@@ -17,6 +17,15 @@ extern "C" void _start() {
     GlobalDescriptorTable::init();
     Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
 
+    // Update the stack to point to the GDT
+    asm("movw %0, %%ax     \n \
+         movw %%ax, %%ss   \n \
+         movl %1, %%esp"            
+        : 
+        : "i"((GDT_SEGMENT_STACK*sizeof(gdt_descriptor))), 
+          "i"(GDT_KERNEL_STACK)
+    );
+
     Screen::print("Loading IDT");
     InterruptDescriptorTable::init();
     Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
@@ -33,7 +42,6 @@ extern "C" void _start() {
 
     Screen::print("Launch userland task...\n\n");
     Memory::copy((char*) GDT_USERLAND_LINEAR_BASE, (char*) &userTask, 100);
-    g_tss_default.esp0 = GDT_USERLAND_LINEAR_STACK;
 
     asm("   cli                    \n \
             push %0                \n \
