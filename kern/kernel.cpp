@@ -42,27 +42,7 @@ extern "C" void _start() {
 
     Screen::print("Launch userland task...\n\n");
     Memory::copy((char*) GDT_USERLAND_LINEAR_BASE, (char*) &userTask, 100);
-
-    asm("   cli                    \n \
-            push %0                \n \
-            push %1                \n \
-            pushfl                 \n \
-            popl %%eax             \n \
-            orl $0x200, %%eax      \n \
-            and $0xffffbfff, %%eax \n \
-            push %%eax             \n \
-            push %2                \n \
-            push %3                \n \
-            movw %4, %%ax          \n \
-            movw %%ax, %%ds        \n \
-            iret" 
-            : 
-            : "i"((GDT_SEGMENT_USER_STACK*sizeof(gdt_descriptor)) | RING3), 
-              "i"(GDT_USERLAND_LINEAR_STACK),
-              "i"((GDT_SEGMENT_USER_CODE*sizeof(gdt_descriptor)) | RING3),
-              "i"(GDT_USERLAND_LINEAR_BASE),
-              "i"((GDT_SEGMENT_USER_DATA*sizeof(gdt_descriptor)) | RING3)
-    );
+    callUserFunction(GDT_USERLAND_LINEAR_BASE, GDT_USERLAND_LINEAR_STACK);
 
     Screen::print("Userland task finished :)");
     while (1);
