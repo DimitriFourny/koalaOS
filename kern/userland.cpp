@@ -1,64 +1,73 @@
 #include "userland.h"
 
-#define EFLAGS_INTERRUPT    (1 << 9)
-#define EFLAGS_NESTED_STACK (1 << 14)
+void userTask1() {
+    char* msg = (char*) 0x1000000 + 0x100;
+    msg[0] = 'T';
+    msg[1] = 'a';
+    msg[2] = 's';
+    msg[3] = 'k';
+    msg[4] = ' ';
+    msg[5] = '1';
+    msg[6] = '\n';
+    msg[7] = '\0';
 
-void callUserFunction(u32 function, u32 stack) {
-    // We will manipulate the stack, so we need to save the parameters
-    // EBX = stack
-    // ECX = function
-    asm(" mov %0, %%ebx          \n \
-          mov %1, %%ecx" 
-          : 
-          : "m"(stack),
-            "m"(function)
-    );
+    unsigned int uptime = 0;
+    unsigned int sleep = 0;
+    unsigned int* pUptime = &uptime;
 
-    // Prepare the EFLAGS in EAX
-    asm(" pushfl                 \n \
-          popl %%eax             \n \
-          orl %0, %%eax          \n \
-          and %1, %%eax" 
-          : 
-          : "i"(EFLAGS_INTERRUPT),
-            "i"(~EFLAGS_NESTED_STACK)
-    );
+    while (1) {
+        asm("mov %0, %%ebx    \n\
+             mov $0x02, %%eax \n\
+             int $0x30" 
+             :: "m" (pUptime));
 
-    // Disable the interruptions and jump into ring3
-    asm(" cli                    \n \
-          push %0                \n \
-          push %%ebx             \n \
-          push %%eax             \n \
-          push %1                \n \
-          push %%ecx             \n \
-          movw %2, %%ax          \n \
-          movw %%ax, %%ds        \n \
-          iret" 
-          : 
-          : "i"((GDT_SEGMENT_USER_STACK*sizeof(gdt_descriptor)) | RING3), 
-            "i"((GDT_SEGMENT_USER_CODE*sizeof(gdt_descriptor)) | RING3),
-            "i"((GDT_SEGMENT_USER_DATA*sizeof(gdt_descriptor)) | RING3)
-    );
+        if ((uptime - sleep) > 100) { // every second
+            sleep = uptime;
+
+            asm("mov %0, %%ebx    \n\
+                 mov $0x01, %%eax \n\
+                 int $0x30" 
+                 :: "m" (msg));
+        }
+
+        for (unsigned int i = 0; i < 1000000; i++);
+    }
+    
+    while (1);
 }
 
+void userTask2() {
+    char* msg = (char*) 0x1000000 + 0x200;
+    msg[0] = 'T';
+    msg[1] = 'a';
+    msg[2] = 's';
+    msg[3] = 'k';
+    msg[4] = ' ';
+    msg[5] = '2';
+    msg[6] = '\n';
+    msg[7] = '\0';
 
-void userTask() {
-    char* msg = (char*) 0x1000000 + 0x100;
-    msg[0] = 'H';
-    msg[1] = 'e';
-    msg[2] = 'l';
-    msg[3] = 'l';
-    msg[4] = 'o';
-    msg[5] = '\n';
-    msg[6] = '\0';
+    unsigned int uptime = 0;
+    unsigned int sleep = 0;
+    unsigned int* pUptime = &uptime;
 
-    asm("mov %0, %%ebx    \n\
-         mov $0x01, %%eax \n\
-         int $0x30" 
-         :: "m" (msg));
+    while (1) {
+        asm("mov %0, %%ebx    \n\
+             mov $0x02, %%eax \n\
+             int $0x30" 
+             :: "m" (pUptime));
 
-    asm("mov $0x02, %eax \n\
-         int $0x30");
+        if ((uptime - sleep) > 100) { // every second
+            sleep = uptime;
+
+            asm("mov %0, %%ebx    \n\
+                 mov $0x01, %%eax \n\
+                 int $0x30" 
+                 :: "m" (msg));
+        }
+
+        for (unsigned int i = 0; i < 1000000; i++);
+    }
     
     while (1);
 }

@@ -4,7 +4,7 @@
 #include "types.h"
 #include "GlobalDescriptorTable.h"
 
-void userTask();
-void callUserFunction(u32 function, u32 stack);
+void userTask1();
+void userTask2();
 
 #endif

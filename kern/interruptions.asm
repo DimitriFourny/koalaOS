@@ -31,7 +31,9 @@ asm_int_default:
 
 asm_irq0_clock:
 	SAVE_REGS
+    push esp
 	call isr_clock
+    add esp, 4            ; Clear the stack
 	mov al, 0x20
 	out 0x20, al
 	RESTORE_REGS

@@ -5,6 +5,7 @@
 #include "InterruptServicesRoutines.h"
 #include "Paging.h"
 #include "userland.h"
+#include "Scheduler.h"
 
 extern "C" void _start() {
     Screen::init();
@@ -15,7 +16,7 @@ extern "C" void _start() {
 
     Screen::print("Loading GDT");
     GlobalDescriptorTable::init();
-    Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
+    Screen::print("\t\t\tOK\n", SCREEN_LIGHT_GREEN);
 
     // Update the stack to point to the GDT
     asm("movw %0, %%ax     \n \
@@ -28,23 +29,28 @@ extern "C" void _start() {
 
     Screen::print("Loading IDT");
     InterruptDescriptorTable::init();
-    Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
+    Screen::print("\t\t\tOK\n", SCREEN_LIGHT_GREEN);
 
     Screen::print("PIC Initialization");
     InterruptController::init();
     InterruptDescriptorTable::enable();
-    Screen::print("\tOK\n", SCREEN_LIGHT_GREEN);
+    Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
 
     Screen::print("Paging Initialization");
     Paging::init();
     Paging::enable();
-    Screen::print("\tOK\n", SCREEN_LIGHT_GREEN);
+    Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
 
-    Screen::print("Launch userland task...\n\n");
-    Memory::copy((char*) GDT_USERLAND_LINEAR_BASE, (char*) &userTask, 100);
-    callUserFunction(GDT_USERLAND_LINEAR_BASE, GDT_USERLAND_LINEAR_STACK);
+    Screen::print("Launch userland task 1");
+    Memory::copy((char*) GDT_USERLAND_LINEAR_BASE, (char*) &userTask1, 500);
+    Scheduler::newProcess(GDT_USERLAND_LINEAR_BASE, GDT_USERLAND_LINEAR_STACK);
+    Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
 
-    Screen::print("Userland task finished :)");
+    Screen::print("Launch userland task 2");
+    Memory::copy((char*) GDT_USERLAND_LINEAR_BASE+0x10000, (char*) &userTask2, 500);
+    Scheduler::newProcess(GDT_USERLAND_LINEAR_BASE+0x10000, GDT_USERLAND_LINEAR_STACK+0x10000);
+    Screen::print("\t\tOK\n\n", SCREEN_LIGHT_GREEN);
+
     while (1);
 }
 
