@@ -3,24 +3,21 @@
 #include "Screen.h"
 #include "keyboardUS.h"
 
-bool Keyboard::m_lshift = false;
-bool Keyboard::m_rshift = false;
+bool Keyboard::left_shift_ = false;
+bool Keyboard::right_shift_ = false;
 
-void Keyboard::showCharacter(unsigned char character) {
-  unsigned char c = character;
-  if (c > 0x80)
-    c -= 0x80;
-
-  switch (c) {
+void Keyboard::ShowCharacter(unsigned char character) {
+  switch (character & ~0x80) {
     case 0x29:
-      m_lshift = (c == character);
+      left_shift_ = !(character & 0x80);
       break;
     case 0x35:
-      m_rshift = (c == character);
+      right_shift_ = !(character & 0x80);
       break;
     default:
       if (character < 0x80) {
-        Screen::printCharacter(KEYBOARD[character * 4 + (m_lshift || m_rshift)],
+        const bool is_uppercase = left_shift_ || right_shift_;
+        Screen::printCharacter(KEYBOARD[character * 4 + is_uppercase],
                                SCREEN_LIGHT_MAGENTA);
       }
   }

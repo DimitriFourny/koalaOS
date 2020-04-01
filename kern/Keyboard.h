@@ -3,11 +3,11 @@
 
 class Keyboard {
  public:
-  static void showCharacter(unsigned char character);
+  static void ShowCharacter(unsigned char character);
 
  private:
-  static bool m_lshift;
-  static bool m_rshift;
+  static bool left_shift_;
+  static bool right_shift_;
 };
 
 #endif

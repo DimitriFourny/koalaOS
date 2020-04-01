@@ -25,7 +25,7 @@ void isr_clock(struct Context* context) {
 void isr_keyboard() {
   unsigned char character = inb(0x60);
   character--;
-  Keyboard::showCharacter(character);
+  Keyboard::ShowCharacter(character);
 }
 
 void do_syscall(int sys_num, struct Context* context) {
