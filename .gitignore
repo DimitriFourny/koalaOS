@@ -1,1 +1,5 @@
 bochsout.txt
+*.o
+boot/bootloader
+kern/kernel
+floppyA
