@@ -1,5 +1,5 @@
 KERN=kernel
-CXX=g++ -m32 -Wall -fno-stack-protector
+CXX=g++ -m32 -Wall -fno-stack-protector -fno-pie
 SRC= $(filter-out kernel.cpp, $(wildcard *.cpp))
 OBJ=kernel.o $(SRC:.cpp=.o) interruptions.o
 
