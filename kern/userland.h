@@ -1,8 +1,8 @@
 #ifndef H_USERLAND
 #define H_USERLAND
 
-#include "types.h"
 #include "GlobalDescriptorTable.h"
+#include "types.h"
 
 void userTask1();
 void userTask2();
