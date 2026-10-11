@@ -1,17 +1,27 @@
-OBJ=floppyA 
+QEMU ?= qemu-system-i386
+QEMU_FLAGS ?=
 
-all: $(OBJ) 
+.PHONY: all bootloader kernel run clean
+.DELETE_ON_ERROR:
+
+all: floppyA
 
 floppyA: bootloader kernel
-	cat boot/bootloader kern/kernel /dev/zero | dd of=floppyA bs=512 count=2880
+	dd if=/dev/zero of=$@ bs=512 count=2880
+	cat boot/bootloader kern/kernel | dd of=$@ bs=512 conv=notrunc
 
-bootloader: 
-	make -C boot
+bootloader:
+	$(MAKE) -C boot
 
-kernel: 
-	make -C kern
+kernel:
+	$(MAKE) -C kern
+
+run: floppyA
+	$(QEMU) -machine pc -accel tcg -m 32 -boot order=a \
+		-drive file=floppyA,format=raw,if=floppy,readonly=on \
+		-no-reboot $(QEMU_FLAGS)
 
 clean:
-	rm -f $(OBJ) *.o
-	make -C boot clean
-	make -C kern clean
+	rm -f floppyA
+	$(MAKE) -C boot clean
+	$(MAKE) -C kern clean

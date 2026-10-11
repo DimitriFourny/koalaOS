@@ -63,7 +63,7 @@ void Screen::printCharacter(unsigned char c, unsigned char attributes) {
   }
 
   if (m_y >= SCREEN_HEIGHT) {
-    scrollUp(m_y - SCREEN_HEIGHT);
+    scrollUp(m_y - SCREEN_HEIGHT + 1);
   }
 }
 

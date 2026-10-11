@@ -1,5 +1,6 @@
 extern isr_default, isr_clock, isr_keyboard, do_syscall
 global asm_int_default, asm_irq0_clock, asm_irq1_keyboard, asm_syscall
+global asm_resume_process
 
 %macro SAVE_REGS 0
   pushad
@@ -56,5 +57,14 @@ asm_syscall:
                         ; SAVE_REGS
   call do_syscall
   add esp, 8            ; Clear the stack
+  RESTORE_REGS
+  iret
+
+; The Context layout matches SAVE_REGS followed by the CPU's iret frame.
+; Restore outside C++ so compiler register allocation cannot corrupt the frame.
+asm_resume_process:
+  mov al, 0x20
+  out 0x20, al          ; Acknowledge the timer interrupt
+  mov esp, [esp+4]      ; Switch to the selected process's saved Context
   RESTORE_REGS
   iret

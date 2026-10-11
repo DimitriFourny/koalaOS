@@ -7,7 +7,7 @@
 #include "Screen.h"
 #include "userland.h"
 
-extern "C" void _start() {
+extern "C" void kernel_main() {
   Screen::init();
   Screen::clear();
 
@@ -18,13 +18,12 @@ extern "C" void _start() {
   GlobalDescriptorTable::init();
   Screen::print("\t\t\tOK\n", SCREEN_LIGHT_GREEN);
 
-  // Update the stack to point to the GDT
-  asm("movw %0, %%ax     \n \
-         movw %%ax, %%ss   \n \
-         movl %1, %%esp"
-      :
-      : "i"((GDT_SEGMENT_STACK * sizeof(gdt_descriptor))),
-        "i"(GDT_KERNEL_STACK));
+  // The assembly entry point has already set up the kernel stack.
+  asm volatile("movw %0, %%ax\n"
+               "movw %%ax, %%ss"
+               :
+               : "i"(GDT_SEGMENT_STACK * sizeof(gdt_descriptor))
+               : "eax");
 
   Screen::print("Loading IDT");
   InterruptDescriptorTable::init();
@@ -32,7 +31,6 @@ extern "C" void _start() {
 
   Screen::print("PIC Initialization");
   InterruptController::init();
-  InterruptDescriptorTable::enable();
   Screen::print("\t\tOK\n", SCREEN_LIGHT_GREEN);
 
   Screen::print("Paging Initialization");
@@ -51,6 +49,9 @@ extern "C" void _start() {
   Scheduler::newProcess(GDT_USERLAND_LINEAR_BASE + 0x10000,
                         GDT_USERLAND_LINEAR_STACK + 0x10000);
   Screen::print("\t\tOK\n\n", SCREEN_LIGHT_GREEN);
+
+  // Timer interrupts schedule tasks, so enable them only once tasks exist.
+  InterruptDescriptorTable::enable();
 
   while (1)
     ;

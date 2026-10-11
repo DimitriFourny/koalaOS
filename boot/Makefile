@@ -1,10 +1,11 @@
-OBJ=bootloader 
+NASM ?= nasm
 
-all: $(OBJ) 
+.PHONY: all clean
+
+all: bootloader
 
 bootloader: bootloader.asm
-	nasm -f bin -o $@ $^ ;
+	$(NASM) -f bin -o $@ $<
 
 clean:
-	rm -f $(OBJ) *.o
-
+	rm -f bootloader

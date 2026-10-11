@@ -20,7 +20,7 @@ void userTask1() {
              mov $0x02, %%eax \n\
              int $0x30" ::"m"(pUptime));
 
-    if ((uptime - sleep) > 100) {  // every second
+    if ((uptime - sleep) > 100) {  // after 100 timer ticks
       sleep = uptime;
 
       asm("mov %0, %%ebx    \n\
@@ -56,7 +56,7 @@ void userTask2() {
              mov $0x02, %%eax \n\
              int $0x30" ::"m"(pUptime));
 
-    if ((uptime - sleep) > 100) {  // every second
+    if ((uptime - sleep) > 100) {  // after 100 timer ticks
       sleep = uptime;
 
       asm("mov %0, %%ebx    \n\

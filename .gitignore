@@ -1,5 +1,5 @@
-bochsout.txt
 *.o
+*.d
 boot/bootloader
 kern/kernel
 floppyA
